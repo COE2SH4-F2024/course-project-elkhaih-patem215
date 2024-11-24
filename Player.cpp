@@ -7,7 +7,7 @@ Player::Player(GameMechs* thisGMRef)
     myDir = STOP;
 
     // more actions to be included
-    playerPos.setObjPos(5,5, '$');
+    playerPos.setObjPos(15, 7,'$');
 
 }
 
@@ -66,7 +66,10 @@ void Player::updatePlayerDir()
             default:
                 myDir = STOP;
                 break;
-        }         
+
+            mainGameMechsRef->clearInput();  
+        }    
+
 }
 
 void Player::movePlayer()
@@ -78,24 +81,42 @@ void Player::movePlayer()
     switch (myDir)
     {
         case UP:
-            playerPos.pos -> y = (playerPos.pos->y - 1 + BoardSizeY) % BoardSizeY;
+            playerPos.pos -> y--;
+            
+            if(playerPos.pos -> y < 1)
+            {
+                playerPos.pos -> y = 13; //wrap around, up to down
+            }
             break;
 
         case DOWN:
-            playerPos.pos -> y = (playerPos.pos->y + 1) % BoardSizeY;
+            playerPos.pos -> y++;
+            if(playerPos.pos -> y> 13)
+            {
+                playerPos.pos -> y = 1; //wrap around, down to up
+            }
             break;
 
         case LEFT:
-            playerPos.pos -> x = (playerPos.pos->x - 1 + BoardSizeX) % BoardSizeX;
+            playerPos.pos -> x--;
+            if(playerPos.pos -> x < 1)
+            {
+                playerPos.pos -> x = 28; //wrap around, left to right
+            }
             break;
 
         case RIGHT:
-            playerPos.pos -> x = (playerPos.pos->x + 1) % BoardSizeX;
+            playerPos.pos -> x++;
+            if(playerPos.pos -> x > 28)
+            {
+                playerPos.pos -> x = 1; //wrap around, right to left
+            }
             break;
 
         default:
             break;
     }
+
 }
 
 // More methods to be added

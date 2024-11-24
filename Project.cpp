@@ -13,7 +13,7 @@ bool exitFlag;
 const int board_width = 30;
 const int board_height = 15; 
 const int num_obj = 3; // test with 3 objs first
-char input;
+
 
 objPos objects[num_obj]; //array to hold objPos objects
 
@@ -68,7 +68,8 @@ void GetInput(void)
     
     if(MacUILib_hasChar())
     {
-        input = MacUILib_getChar();
+        char input = MacUILib_getChar();
+        gameMechanics->setInput(input);
     }
 
 }
@@ -77,6 +78,11 @@ void RunLogic(void)
 {
     player -> updatePlayerDir();
     player -> movePlayer();
+
+    if(gameMechanics->getExitFlagStatus())
+    {
+        exitFlag = true;
+    }
 
 //      if (input == 27)
 //     {
