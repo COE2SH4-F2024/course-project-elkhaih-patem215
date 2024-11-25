@@ -7,6 +7,7 @@ using namespace std;
 
 
 // WARNING!!  This test suite does not contain any test cases for accessing elements out-of-bound.
+
 //
 // You must deploy exception throwing for all out-of-bound accesses.
 int successCount, passCount;
@@ -22,7 +23,40 @@ void tearDown(bool result);
 // Turn this true once you have implemented the Minimum Four Special Member Functions!!
 int testReady = true;
 // ******************* //
+void testOutOfBounds_EmptyList() {
+    printf("\n=== testOutOfBounds_EmptyList() ===\n");
+    bool result = true;
 
+    objPosArrayList thisList; // Create an empty list
+
+    // Test negative index
+    try {
+        thisList.getElement(-1); // Access a negative index in an empty list
+        result = false; // Fail if no exception is thrown
+    } catch (const std::out_of_range& e) {
+        result &= true; // Pass if exception is thrown
+    }
+
+    tearDown(result);
+}
+
+void testOutOfBounds_NonEmptyList() {
+    printf("\n=== testOutOfBounds_NonEmptyList() ===\n");
+    bool result = true;
+
+    objPosArrayList thisList;
+    thisList.insertTail(objPos(5, 5, 'A')); // Add one element
+
+    try {
+        thisList.getElement(-1); // Attempt to access a negative index
+        result = false; // Fail if no exception is thrown
+    } catch (const std::out_of_range& e) {
+        result &= true; // Pass if exception is thrown
+    }
+
+
+    tearDown(result);
+}
 
 
 
@@ -432,6 +466,10 @@ void testRemoveTail_5Element()
 
 		testRemoveTail_1Element();
 		testRemoveTail_5Element();
+
+		testOutOfBounds_EmptyList();
+		testOutOfBounds_NonEmptyList();
+
 		
 		return (successCount == totalAssertions);
 	}
