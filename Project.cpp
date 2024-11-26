@@ -57,10 +57,9 @@ void Initialize(void)
     gameMechanics = new GameMechs(board_width, board_height);
     player = new Player(gameMechanics);
 
+    gameMechanics->generateFood(player->getPlayerPos());
 
-    // objects[0].setObjPos(5, 5, 'A');
-    // objects[1].setObjPos(10, 10, 'B');
-    // objects[2].setObjPos(15, 7, 'C');
+
 }
 
 void GetInput(void)
@@ -84,10 +83,8 @@ void RunLogic(void)
         exitFlag = true;
     }
 
-//      if (input == 27)
-//     {
-//         exitFlag = true;
-//     }
+
+
 }
 
 void DrawScreen(void)
@@ -99,42 +96,44 @@ void DrawScreen(void)
     {
         for(int x = 0; x < board_width; ++x)
         {
+
+            if(x==0 || x == board_width - 1 || y == 0 || y == board_height - 1)
+            {
+                cout << '#'; //border
+                continue;
+            }
+
             bool printed = false;
 
-            if (player -> getPlayerPos().pos->x == x && player -> getPlayerPos().pos->y == y)
+            //Draw player
+            if (!printed && player -> getPlayerPos().pos->x == x && player -> getPlayerPos().pos->y == y)
             {
                 cout << player-> getPlayerPos().symbol;
                 printed = true;
             }
 
-            // //check if objPos exists at this position 
-            // for (int i = 0; i < num_obj; ++i)
-            // {
-            //     if (objects[i].pos->x == x && objects[i].pos->y == y)
-            //     {
-            //         cout << objects[i].symbol;
-            //         printed = true;
-            //         break;
-            //     }
-            // }
+            //Draw food
+            objPos food = gameMechanics->getFoodPos();
+            if (!printed && food.pos != nullptr && food.pos->x == x && food.pos-> y == y)
+            {
+                cout << food.symbol;
+                printed = true;
+            }
 
-            //draw border or empty space
+        
+
             if(!printed)
             {
-                if (x == 0 || x == board_width - 1 || y == 0 || y == board_height -1)
-                {
-                    cout << '#'; //boarder
-                }
-
-                else
-                {
-                    cout << " ";
-                }
+                cout << " ";
             }
+
         }
 
         cout << '\n';
+
+        
     }
+
 }
 
 void LoopDelay(void)

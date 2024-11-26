@@ -16,6 +16,30 @@ GameMechs::GameMechs(int boardX, int boardY)
 
 }
 
+void GameMechs::generateFood(const objPos& blockOff)
+{
+    srand(time(0));
+    int newX, newY;
+    bool posValid = false;
+
+    while(!posValid)
+    {
+        newX = rand() % boardSizeX;
+        newY = rand() % boardSizeY;
+
+        if (newX != blockOff.pos->x || newY != blockOff.pos->y)
+        {
+            posValid = true;
+        }
+    }
+
+    food.setObjPos(newX, newY, '*');
+}
+
+objPos GameMechs::getFoodPos() const
+{
+    return food;
+}
 // do you need a destructor?
 GameMechs::~GameMechs()
 {
