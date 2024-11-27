@@ -57,7 +57,7 @@ void Initialize(void)
     gameMechanics = new GameMechs(board_width, board_height);
     player = new Player(gameMechanics);
 
-    gameMechanics->generateFood(player->getPlayerPos());
+    gameMechanics->generateFood(*player->getPlayerPosList());
 
 
 }
@@ -99,41 +99,37 @@ void DrawScreen(void)
 
             if(x==0 || x == board_width - 1 || y == 0 || y == board_height - 1)
             {
-                cout << '#'; //border
+                std::cout << '#'; //border
                 continue;
             }
 
             bool printed = false;
 
-            //Draw player
-            if (!printed && player -> getPlayerPos().pos->x == x && player -> getPlayerPos().pos->y == y)
-            {
-                cout << player-> getPlayerPos().symbol;
+            // Draw the snake
+            objPosArrayList* snakeBody = player->getPlayerPosList();
+            for (int i = 0; i < snakeBody->getSize(); ++i) {
+                objPos segment = snakeBody->getElement(i);
+                if (segment.pos->x == x && segment.pos->y == y) {
+                    std::cout << segment.symbol;
+                    printed = true;
+                    break;
+                }
+            }
+
+            // Draw the food
+           objPos food = gameMechanics->getFoodPos();
+            if (!printed && food.pos != nullptr && food.pos->x == x && food.pos->y == y) {
+                std::cout << food.symbol; // Food symbol
                 printed = true;
             }
 
-            //Draw food
-            objPos food = gameMechanics->getFoodPos();
-            if (!printed && food.pos != nullptr && food.pos->x == x && food.pos-> y == y)
-            {
-                cout << food.symbol;
-                printed = true;
+            // Draw empty spaces
+            if (!printed) {
+                std::cout << ' ';
             }
-
-        
-
-            if(!printed)
-            {
-                cout << " ";
-            }
-
         }
-
-        cout << '\n';
-
-        
+        std::cout << '\n'; // Move to the next line after each row
     }
-
 }
 
 void LoopDelay(void)
@@ -151,3 +147,4 @@ void CleanUp(void)
     delete player;
     delete gameMechanics;
 }
+

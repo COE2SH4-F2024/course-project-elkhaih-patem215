@@ -1,8 +1,5 @@
 #include "objPosArrayList.h"
 
-// Paste your Tested implementation here.
-// Paste your Tested implementation here.
-// Paste your Tested implementation here.
 #include "objPosArrayList.h"
 
 // Check lecture contents on general purpose array list construction, 
@@ -79,11 +76,10 @@ void objPosArrayList::removeHead()
     listSize--;
 }
 
-void objPosArrayList::removeTail()
-{
-    if (listSize == 0)
-    {
-        throw std::underflow_error ("Array is empty");
+void objPosArrayList::removeTail() {
+    if (listSize == 0) {
+        // Prevent underflow error
+        return;
     }
 
     listSize--;

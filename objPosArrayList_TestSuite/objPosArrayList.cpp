@@ -74,11 +74,10 @@ void objPosArrayList::removeHead()
     listSize--;
 }
 
-void objPosArrayList::removeTail()
-{
-    if (listSize == 0)
-    {
-        throw std::underflow_error ("Array is empty");
+void objPosArrayList::removeTail() {
+    if (listSize == 0) {
+        // Prevent underflow error
+        return;
     }
 
     listSize--;
