@@ -23,14 +23,16 @@ class Player
         objPosArrayList* getPlayerPosList() const; // Upgrade this in iteration 3.       
         void updatePlayerDir();
         void movePlayer();
-        void checkfoodcoll();
-        void checkselfcoll();
+        void checkfoodcoll(const objPos& headNew);
+        void checkselfcoll(const objPos& headNew);
+        void handleMovement(const objPos& headNew);
 
         // More methods to be added here
 
     private:
         objPosArrayList* playerPosList; // Upgrade this in iteration 3.       
         enum Dir myDir;
+        int quit = 0;
 
         // Need a reference to the Main Game Mechanisms
         GameMechs* mainGameMechsRef;

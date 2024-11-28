@@ -15,10 +15,12 @@ const int board_height = 15;
 const int num_obj = 3; // test with 3 objs first
 
 
+
+
 objPos objects[num_obj]; //array to hold objPos objects
 
-GameMechs* gameMechanics;
-Player* player;
+GameMechs* gameMechanics; // Pointer to GameMechs object
+Player* player;           // Pointer to Player object
 
 void Initialize(void);
 void GetInput(void);
@@ -87,19 +89,15 @@ void RunLogic(void)
 
 }
 
-void DrawScreen(void)
-{
-    MacUILib_clearScreen();    
+void DrawScreen(void) {
+    MacUILib_clearScreen(); // Clear the screen before drawing
 
-    //draw the game board
-    for(int y = 0; y < board_height; ++y)
-    {
-        for(int x = 0; x < board_width; ++x)
-        {
-
-            if(x==0 || x == board_width - 1 || y == 0 || y == board_height - 1)
-            {
-                std::cout << '#'; //border
+    // Draw the game board
+    for (int y = 0; y < board_height; ++y) {
+        for (int x = 0; x < board_width; ++x) {
+            // Draw borders
+            if (x == 0 || x == board_width - 1 || y == 0 || y == board_height - 1) {
+                std::cout << '#';
                 continue;
             }
 
@@ -117,8 +115,8 @@ void DrawScreen(void)
             }
 
             // Draw the food
-           objPos food = gameMechanics->getFoodPos();
-            if (!printed && food.pos != nullptr && food.pos->x == x && food.pos->y == y) {
+            objPos food = gameMechanics->getFoodPos();
+            if (!printed && food.pos->x == x && food.pos->y == y) {
                 std::cout << food.symbol; // Food symbol
                 printed = true;
             }
@@ -130,21 +128,37 @@ void DrawScreen(void)
         }
         std::cout << '\n'; // Move to the next line after each row
     }
-}
 
+    // Display the score below the game board
+    std::cout << "Score: " << gameMechanics->getScore() << "\n";
+    std::cout << "Use 'W', 'A', 'S', 'D' to move. Press ESC to quit.\n";
+}
 void LoopDelay(void)
 {
     MacUILib_Delay(DELAY_CONST); // 0.1s delay
 }
 
 
-void CleanUp(void)
-{
-    MacUILib_clearScreen();    
+void CleanUp(void) {
+    MacUILib_clearScreen();
+
+    // Display appropriate end-game message
+    if (gameMechanics->getLoseFlagStatus()) {
+        MacUILib_printf("You lost! Better luck next time!\n");
+    } else {
+        MacUILib_printf("Thanks for playing! Your final score: %d\n", gameMechanics->getScore());
+    }
+
+    // Delete dynamically allocated objects safely
+    if (player) {
+        delete player;
+        player = nullptr; // Avoid dangling pointer
+    }
+
+    if (gameMechanics) {
+        delete gameMechanics;
+        gameMechanics = nullptr; // Avoid dangling pointer
+    }
 
     MacUILib_uninit();
-    
-    delete player;
-    delete gameMechanics;
 }
-

@@ -8,15 +8,15 @@ Player::Player(GameMechs* thisGMRef)
 
     // more actions to be included
     playerPosList = new objPosArrayList();
-    playerPosList -> insertHead(objPos(15, 7,'$'));
+    playerPosList->insertHead(objPos(15, 7, '$'));
 
 }
 
 
-Player::~Player()
+Player::~Player() 
 {
-    // delete any heap members here
-    delete playerPosList;
+    delete playerPosList; // Deallocate the snake body list
+    playerPosList = nullptr;
 }
 
 objPosArrayList* Player::getPlayerPosList() const
@@ -35,6 +35,7 @@ void Player::updatePlayerDir()
         {                      
             case 27:  // exit if ESC key pressed
                 mainGameMechsRef -> setExitTrue();
+                quit = 1;
                 break;
 
             //w for moving up
@@ -74,88 +75,36 @@ void Player::updatePlayerDir()
 
 }
 
-void Player::movePlayer()
-{
-    // PPA3 Finite State Machine logic
-    // int BoardSizeX = mainGameMechsRef -> getBoardSizeX();
-    // int BoardSizeY = mainGameMechsRef -> getBoardSizeY();
+void Player::movePlayer() {
+    objPos headCur = playerPosList->getHeadElement();
+    objPos headNew = headCur;
 
-    // switch (myDir)
-    // {
-    //     case UP:
-    //         playerPos.pos -> y--;
-            
-    //         if(playerPos.pos -> y < 1)
-    //         {
-    //             playerPos.pos -> y = 13; //wrap around, up to down
-    //         }
-    //         break;
-
-    //     case DOWN:
-    //         playerPos.pos -> y++;
-    //         if(playerPos.pos -> y> 13)
-    //         {
-    //             playerPos.pos -> y = 1; //wrap around, down to up
-    //         }
-    //         break;
-
-    //     case LEFT:
-    //         playerPos.pos -> x--;
-    //         if(playerPos.pos -> x < 1)
-    //         {
-    //             playerPos.pos -> x = 28; //wrap around, left to right
-    //         }
-    //         break;
-
-    //     case RIGHT:
-    //         playerPos.pos -> x++;
-    //         if(playerPos.pos -> x > 28)
-    //         {
-    //             playerPos.pos -> x = 1; //wrap around, right to left
-    //         }
-    //         break;
-
-    //     default:
-    //         break;
-    // }
-
-    objPos head = playerPosList->getHeadElement();
-    int newX = head.pos->x, newY = head.pos->y;
-
-    switch (myDir) 
-    {
-        case UP: newY--; break;
-        case DOWN: newY++; break;
-        case LEFT: newX--; break;
-        case RIGHT: newX++; break;
-        default: return; 
+    // Determine the new head position based on direction
+    switch (myDir) {
+        case UP:    headNew.pos->y--; break;
+        case DOWN:  headNew.pos->y++; break;
+        case LEFT:  headNew.pos->x--; break;
+        case RIGHT: headNew.pos->x++; break;
+        default:    return; // No movement
     }
 
-    if (newX < 1) newX = mainGameMechsRef->getBoardSizeX() - 2;
-    if (newX >= mainGameMechsRef->getBoardSizeX() - 1) newX = 1;
-    if (newY < 1) newY = mainGameMechsRef->getBoardSizeY() - 2;
-    if (newY >= mainGameMechsRef->getBoardSizeY() - 1) newY = 1;
+    // Handle board wrap-around
+    if (headNew.pos->x < 1) headNew.pos->x = mainGameMechsRef->getBoardSizeX() - 2;
+    if (headNew.pos->x >= mainGameMechsRef->getBoardSizeX() - 1) headNew.pos->x = 1;
+    if (headNew.pos->y < 1) headNew.pos->y = mainGameMechsRef->getBoardSizeY() - 2;
+    if (headNew.pos->y >= mainGameMechsRef->getBoardSizeY() - 1) headNew.pos->y = 1;
 
-    playerPosList->insertHead(objPos(newX, newY, '$')); // Add new head
-    checkfoodcoll(); 
-    checkselfcoll(); // Check for self-collision
-
-    // Only remove the tail if the snake didn't grow
-    if (playerPosList->getSize() > 1) 
-    {
-        playerPosList->removeTail();
-    }
-    
+    // Check collisions
+    checkfoodcoll(headNew); // Handle food collision and growth
+    checkselfcoll(headNew); // Handle self-collision (game over)
 }
-
 // More methods to be added
 
-void Player::checkselfcoll() {
-    objPos head = playerPosList->getHeadElement();
-
-    for (int i = 1; i < playerPosList->getSize(); ++i) {
-        objPos bodySegment = playerPosList->getElement(i);
-        if (head.isPosEqual(&bodySegment)) {
+void Player::checkselfcoll(const objPos& headNew) {
+    // Check if the new head position collides with any part of the snake body
+    for (int i = 1; i < playerPosList->getSize(); ++i) { // Skip the head (index 0)
+        objPos bodyPart = playerPosList->getElement(i);
+        if (headNew.pos->x == bodyPart.pos->x && headNew.pos->y == bodyPart.pos->y) {
             mainGameMechsRef->setLoseFlag();
             mainGameMechsRef->setExitTrue();
             break;
@@ -163,19 +112,29 @@ void Player::checkselfcoll() {
     }
 }
 
-void Player::checkfoodcoll() {
-    objPos head = playerPosList->getHeadElement(); // Get the head of the snake
-    objPos food = mainGameMechsRef->getFoodPos();  // Get the food's position
+void Player::checkfoodcoll(const objPos& headNew) {
+    // Check if the head collides with food
+    objPos foodPos = mainGameMechsRef->getFoodPos();
+    if (headNew.pos->x == foodPos.pos->x && headNew.pos->y == foodPos.pos->y) {
+        // Add new head but do not remove tail (snake grows)
+        playerPosList->insertHead(headNew);
 
-    // Check if the snake's head is at the same position as the food
-    if (head.isPosEqual(&food)) {
-        mainGameMechsRef->incrementScore(); // Increase score
-        mainGameMechsRef->generateFood(*playerPosList); // Generate a new food position
-        // Do not remove the tail (this is what grows the snake)
+        // Increment score and generate new food
+        mainGameMechsRef->incrementScore();
+        mainGameMechsRef->generateFood(*playerPosList);
     } else {
-        // If no food was eaten, remove the tail to maintain snake length
-        if (playerPosList->getSize() > 1) {
-            playerPosList->removeTail();
-        }
+        // Regular movement (add head, remove tail)
+        playerPosList->insertHead(headNew);
+        playerPosList->removeTail();
+    }
+}
+
+void Player::handleMovement(const objPos& headNew) 
+{
+    playerPosList->insertHead(headNew);
+
+    // Remove the tail only if food was not consumed
+    if (playerPosList->getSize() > 1) {
+        playerPosList->removeTail();
     }
 }

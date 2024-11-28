@@ -16,38 +16,18 @@ GameMechs::GameMechs(int boardX, int boardY)
 
 }
 
-// void GameMechs::generateFood(const objPos& blockOff)
-// {
-//     srand(time(0));
-//     int newX, newY;
-//     bool posValid = false;
-
-//     while(!posValid)
-//     {
-//         newX = rand() % boardSizeX;
-//         newY = rand() % boardSizeY;
-
-//         if (newX != blockOff.pos->x || newY != blockOff.pos->y)
-//         {
-//             posValid = true;
-//         }
-//     }
-
-//     food.setObjPos(newX, newY, '*');
-// }
-
 void GameMechs::generateFood(const objPosArrayList& snakeBody) {
     srand(time(0)); // Seed random number generator
     int newX, newY;
     bool posValid = false;
 
-    // Generate food position that does not overlap with the snake's body
     while (!posValid) {
-        newX = rand() % boardSizeX;
-        newY = rand() % boardSizeY;
+        // Generate random position
+        newX = rand() % (boardSizeX - 2) + 1;
+        newY = rand() % (boardSizeY - 2) + 1;
         posValid = true;
 
-        // Check if the new position overlaps with any part of the snake
+        // Check for overlap with snake body
         for (int i = 0; i < snakeBody.getSize(); ++i) {
             if (snakeBody.getElement(i).pos->x == newX &&
                 snakeBody.getElement(i).pos->y == newY) {
@@ -57,9 +37,10 @@ void GameMechs::generateFood(const objPosArrayList& snakeBody) {
         }
     }
 
-    // Set the new food position and symbol
-    food.setObjPos(newX, newY, '*');
+    // Set the new food position
+    food.setObjPos(newX, newY, '@');
 }
+
 
 objPos GameMechs::getFoodPos() const
 {
