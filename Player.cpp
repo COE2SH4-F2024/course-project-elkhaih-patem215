@@ -94,9 +94,10 @@ void Player::movePlayer() {
     if (headNew.pos->y < 1) headNew.pos->y = mainGameMechsRef->getBoardSizeY() - 2;
     if (headNew.pos->y >= mainGameMechsRef->getBoardSizeY() - 1) headNew.pos->y = 1;
 
-    // Check collisions
-    checkfoodcoll(headNew); // Handle food collision and growth
-    checkselfcoll(headNew); // Handle self-collision (game over)
+    // Check for collisions
+    checkfoodcoll(headNew);       // Handle regular food collision
+    checkSpecialfoodcoll(headNew); // Handle special food collision
+    checkselfcoll(headNew);       // Handle self-collision (end game if necessary)
 }
 // More methods to be added
 
@@ -113,21 +114,27 @@ void Player::checkselfcoll(const objPos& headNew) {
 }
 
 void Player::checkfoodcoll(const objPos& headNew) {
-    // Check if the head collides with food
-    objPos foodPos = mainGameMechsRef->getFoodPos();
-    if (headNew.pos->x == foodPos.pos->x && headNew.pos->y == foodPos.pos->y) {
-        // Add new head but do not remove tail (snake grows)
-        playerPosList->insertHead(headNew);
+    // Check collision with regular foods
+    for (int i = 0; i < 2; ++i) {
+        objPos food = mainGameMechsRef->getRegularFood(i);
+        if (headNew.pos->x == food.pos->x && headNew.pos->y == food.pos->y) {
+            // Add new head without removing the tail to grow the snake
+            playerPosList->insertHead(headNew);
 
-        // Increment score and generate new food
-        mainGameMechsRef->incrementScore();
-        mainGameMechsRef->generateFood(*playerPosList);
-    } else {
-        // Regular movement (add head, remove tail)
-        playerPosList->insertHead(headNew);
-        playerPosList->removeTail();
+            // Increment score
+            mainGameMechsRef->incrementScore();
+
+            // Regenerate all foods
+            mainGameMechsRef->generateFoods(*playerPosList);
+            return; // Exit after handling collision
+        }
     }
+
+    // If no collision with food, perform regular movement
+    playerPosList->insertHead(headNew);
+    playerPosList->removeTail(); // Only remove the tail if no food is eaten
 }
+
 
 void Player::handleMovement(const objPos& headNew) 
 {
@@ -136,5 +143,23 @@ void Player::handleMovement(const objPos& headNew)
     // Remove the tail only if food was not consumed
     if (playerPosList->getSize() > 1) {
         playerPosList->removeTail();
+    }
+}
+
+
+
+void Player::checkSpecialfoodcoll(const objPos& headNew) {
+    // Check if special food is active
+    if (mainGameMechsRef->isSpecialFoodActive()) {
+        objPos specialFood = mainGameMechsRef->getSpecialFood();
+
+        // If the snake's head collides with the special food
+        if (headNew.pos->x == specialFood.pos->x && headNew.pos->y == specialFood.pos->y) {
+            mainGameMechsRef->incrementScore(20); // Add 20 points to the score
+
+            // Deactivate the special food and regenerate all foods
+            mainGameMechsRef->setSpecialFoodActive(false); // Mark special food as inactive
+            mainGameMechsRef->generateFoods(*playerPosList); // Regenerate all foods
+        }
     }
 }

@@ -26,6 +26,10 @@ class Player
         void checkfoodcoll(const objPos& headNew);
         void checkselfcoll(const objPos& headNew);
         void handleMovement(const objPos& headNew);
+        void checkSpecialfoodcoll(const objPos& headNew);
+
+        //Bonus
+        void setSpecialFoodActive(bool isActive);
 
         // More methods to be added here
 
@@ -36,6 +40,8 @@ class Player
 
         // Need a reference to the Main Game Mechanisms
         GameMechs* mainGameMechsRef;
+
+        
 };
 
 #endif

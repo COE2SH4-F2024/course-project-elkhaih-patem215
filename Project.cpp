@@ -49,19 +49,16 @@ int main(void)
 }
 
 
-void Initialize(void)
+void Initialize(void) 
 {
     MacUILib_init();
     MacUILib_clearScreen();
 
-    exitFlag = false;
-
     gameMechanics = new GameMechs(board_width, board_height);
     player = new Player(gameMechanics);
 
-    gameMechanics->generateFood(*player->getPlayerPosList());
-
-
+    // Generate all foods
+    gameMechanics->generateFoods(*player->getPlayerPosList());
 }
 
 void GetInput(void)
@@ -90,14 +87,12 @@ void RunLogic(void)
 }
 
 void DrawScreen(void) {
-    MacUILib_clearScreen(); // Clear the screen before drawing
+    MacUILib_clearScreen();
 
-    // Draw the game board
     for (int y = 0; y < board_height; ++y) {
         for (int x = 0; x < board_width; ++x) {
-            // Draw borders
             if (x == 0 || x == board_width - 1 || y == 0 || y == board_height - 1) {
-                std::cout << '#';
+                std::cout << '#'; // Border
                 continue;
             }
 
@@ -114,11 +109,22 @@ void DrawScreen(void) {
                 }
             }
 
-            // Draw the food
-            objPos food = gameMechanics->getFoodPos();
-            if (!printed && food.pos->x == x && food.pos->y == y) {
-                std::cout << food.symbol; // Food symbol
-                printed = true;
+            // Draw regular foods
+            for (int i = 0; i < 2; ++i) {
+                objPos food = gameMechanics->getRegularFood(i);
+                if (!printed && food.pos->x == x && food.pos->y == y) {
+                    std::cout << food.symbol; // Regular food symbol (*)
+                    printed = true;
+                }
+            }
+
+            // Draw special food
+            if (!printed && gameMechanics->isSpecialFoodActive()) {
+                objPos specialFood = gameMechanics->getSpecialFood();
+                if (specialFood.pos->x == x && specialFood.pos->y == y) {
+                    std::cout << specialFood.symbol; // Special food symbol (@)
+                    printed = true;
+                }
             }
 
             // Draw empty spaces
@@ -126,13 +132,14 @@ void DrawScreen(void) {
                 std::cout << ' ';
             }
         }
-        std::cout << '\n'; // Move to the next line after each row
+        std::cout << '\n'; // Move to the next line
     }
 
-    // Display the score below the game board
+    // Display score below the game board
     std::cout << "Score: " << gameMechanics->getScore() << "\n";
     std::cout << "Use 'W', 'A', 'S', 'D' to move. Press ESC to quit.\n";
 }
+
 void LoopDelay(void)
 {
     MacUILib_Delay(DELAY_CONST); // 0.1s delay
