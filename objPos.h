@@ -1,43 +1,48 @@
 #ifndef OBJPOS_H
 #define OBJPOS_H
 
-// Not really a C++ thing
+// Define a simple struct to hold positional coordinates (x, y)
+// Not typically a C++ feature, but used here for simplicity.
 typedef struct 
 {
-    int x;
-    int y;
+    int x; // x-coordinate
+    int y; // y-coordinate
 } Pos;
 
+// Define the objPos class, which represents an object with a position and a symbol
 class objPos
 {
     public:
-        Pos* pos;        
-        char symbol;
+        Pos* pos;        // Pointer to a Pos struct representing the position
+        char symbol;     // Character symbol representing the object
 
-        //Constructors 
-        objPos();
-        objPos(int xPos, int yPos, char sym);
-        
-        // Respect the rule of six / minimum four
-        // [TODO] Implement the missing special member functions to meet the minimum four rule
-        
-        //Destructor
-        ~objPos();
+        // Constructors
+        objPos();                              // Default constructor (initializes position to (0, 0) and symbol to 0)
+        objPos(int xPos, int yPos, char sym);  // Parameterized constructor (initializes position and symbol)
 
-        //Copy Constructor
-        objPos (const objPos& other);
+        // The "Rule of Four/Six" requires certain special member functions to be implemented
+        // [TODO]: Implement move constructor and move assignment operator to follow Rule of Six
 
-        //Copy Assignment operator
-        objPos& operator= (const objPos& other);
-        
-        void setObjPos(objPos o);        
-        void setObjPos(int xPos, int yPos, char sym);  
+        // Destructor
+        ~objPos();                             // Destructor to free dynamically allocated memory
 
-        objPos getObjPos() const;
-        char getSymbol() const;
-        char getSymbolIfPosEqual(const objPos* refPos) const;
-        
-        bool isPosEqual(const objPos* refPos) const;
+        // Copy Constructor
+        objPos(const objPos& other);          // Deep copy constructor to copy data from another objPos object
+
+        // Copy Assignment Operator
+        objPos& operator=(const objPos& other); // Deep copy assignment operator for safe copying
+
+        // Setter methods
+        void setObjPos(objPos o);             // Sets the position and symbol using another objPos object
+        void setObjPos(int xPos, int yPos, char sym); // Sets the position and symbol using specific values
+
+        // Getter methods
+        objPos getObjPos() const;             // Returns a copy of the current objPos object
+        char getSymbol() const;               // Returns the symbol of the current object
+        char getSymbolIfPosEqual(const objPos* refPos) const; // Returns the symbol if the position matches a reference position
+
+        // Utility methods
+        bool isPosEqual(const objPos* refPos) const; // Checks if the position matches a reference position
 };
 
-#endif
+#endif // OBJPOS_H
