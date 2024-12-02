@@ -5,21 +5,17 @@
 #include "Player.h"
 #include "GameMechs.h"
 
-using namespace std;
+using namespace std; 
 
 #define DELAY_CONST 100000
 
-bool exitFlag;
-const int board_width = 30;
-const int board_height = 15; 
-const int num_obj = 3; // test with 3 objs first
+//Global variables and constants 
+bool exitFlag;  //Flag to signal the game loop to exit 
+const int board_width = 30;  //Width of the game board
+const int board_height = 15; //Height of the game board 
 
 
-
-
-objPos objects[num_obj]; //array to hold objPos objects
-
-GameMechs* gameMechanics; // Pointer to GameMechs object
+GameMechs* gameMechanics; // Pointer to GameMechs object for handling game mechanics 
 Player* player;           // Pointer to Player object
 
 void Initialize(void);
@@ -51,32 +47,36 @@ int main(void)
 
 void Initialize(void) 
 {
-    MacUILib_init();
+    MacUILib_init();  
     MacUILib_clearScreen();
 
+    // Create game mechanics and player objects 
     gameMechanics = new GameMechs(board_width, board_height);
     player = new Player(gameMechanics);
 
-    // Generate all foods
+    // Generate food items for the game 
     gameMechanics->generateFoods(*player->getPlayerPosList());
 }
 
 void GetInput(void)
 {
     
+    // Check if a key was pressed
     if(MacUILib_hasChar())
     {
-        char input = MacUILib_getChar();
-        gameMechanics->setInput(input);
+        char input = MacUILib_getChar(); // Get the pressed key
+        gameMechanics->setInput(input);  // Pass input to game mechanics
     }
 
 }
 
 void RunLogic(void)
 {
+    // Update player direction and position
     player -> updatePlayerDir();
     player -> movePlayer();
 
+    // Check if the exit flag is set by the game mechanic
     if(gameMechanics->getExitFlagStatus())
     {
         exitFlag = true;
@@ -89,21 +89,22 @@ void RunLogic(void)
 void DrawScreen(void) {
     MacUILib_clearScreen();
 
+    // Render the game board
     for (int y = 0; y < board_height; ++y) {
         for (int x = 0; x < board_width; ++x) {
             if (x == 0 || x == board_width - 1 || y == 0 || y == board_height - 1) {
-                std::cout << '#'; // Border
+                std::cout << '#'; // Draw border
                 continue;
             }
 
-            bool printed = false;
+            bool printed = false;  // Track if a position is already drawn
 
             // Draw the snake
             objPosArrayList* snakeBody = player->getPlayerPosList();
             for (int i = 0; i < snakeBody->getSize(); ++i) {
                 objPos segment = snakeBody->getElement(i);
                 if (segment.pos->x == x && segment.pos->y == y) {
-                    std::cout << segment.symbol;
+                    std::cout << segment.symbol;  // Draw snake segment
                     printed = true;
                     break;
                 }
@@ -113,7 +114,7 @@ void DrawScreen(void) {
             for (int i = 0; i < 2; ++i) {
                 objPos food = gameMechanics->getRegularFood(i);
                 if (!printed && food.pos->x == x && food.pos->y == y) {
-                    std::cout << food.symbol; // Regular food symbol (*)
+                    std::cout << food.symbol; 
                     printed = true;
                 }
             }
@@ -135,7 +136,7 @@ void DrawScreen(void) {
         std::cout << '\n'; // Move to the next line
     }
 
-    // Display score below the game board
+    // Display score and controls below the game board
     std::cout << "Score: " << gameMechanics->getScore() << "\n";
     std::cout << "Use 'W', 'A', 'S', 'D' to move. Press ESC to quit.\n";
 }
@@ -149,7 +150,7 @@ void LoopDelay(void)
 void CleanUp(void) {
     MacUILib_clearScreen();
 
-    // Display appropriate end-game message
+    // Display end-game message
     if (gameMechanics->getLoseFlagStatus()) {
         MacUILib_printf("You lost! Better luck next time!\n");
     } else {

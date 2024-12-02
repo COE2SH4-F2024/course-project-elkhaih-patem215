@@ -1,35 +1,36 @@
 #include "Player.h"
 
 
-Player::Player(GameMechs* thisGMRef)
+Player::Player(GameMechs* thisGMRef) // Constructor: Initializes the player and sets up the starting position
 {
-    mainGameMechsRef = thisGMRef;
-    myDir = STOP;
+    mainGameMechsRef = thisGMRef; // Store reference to the main game mechanics
+    myDir = STOP;  // Set initial direction to STOP
+
 
     // more actions to be included
-    playerPosList = new objPosArrayList();
-    playerPosList->insertHead(objPos(15, 7, '$'));
-
+    playerPosList = new objPosArrayList(); // Initialize the player's position list
+    playerPosList->insertHead(objPos(15, 7, '$')); // Add the initial head position
 }
 
 
-Player::~Player() 
+
+Player::~Player() // Destructor: Cleans up the player's resources
 {
     delete playerPosList; // Deallocate the snake body list
     playerPosList = nullptr;
 }
 
-objPosArrayList* Player::getPlayerPosList() const
+objPosArrayList* Player::getPlayerPosList() const  // Returns a reference to the player's position list
 {
-    // return the reference to the playerPos arrray list
+    
     return playerPosList;
 }
 
-void Player::updatePlayerDir()
+void Player::updatePlayerDir() // Updates the player's direction based on user input
 {
         // PPA3 input processing logic 
 
-        char input = mainGameMechsRef -> getInput();
+        char input = mainGameMechsRef -> getInput(); // Retrieve input from game mechanics
 
         switch(input)
         {                      
@@ -75,11 +76,12 @@ void Player::updatePlayerDir()
 
 }
 
-void Player::movePlayer() {
-    objPos headCur = playerPosList->getHeadElement();
-    objPos headNew = headCur;
+void Player::movePlayer() // Moves the player in the current direction, handles collisions, and manages wrap-around
+{
+    objPos headCur = playerPosList->getHeadElement(); // Get the current head position
+    objPos headNew = headCur; // Create a new position based on the current head
 
-    // Determine the new head position based on direction
+    // Update the new head position based on the direction
     switch (myDir) {
         case UP:    headNew.pos->y--; break;
         case DOWN:  headNew.pos->y++; break;
@@ -88,7 +90,7 @@ void Player::movePlayer() {
         default:    return; // No movement
     }
 
-    // Handle board wrap-around
+     // Wrap around the board
     if (headNew.pos->x < 1) headNew.pos->x = mainGameMechsRef->getBoardSizeX() - 2;
     if (headNew.pos->x >= mainGameMechsRef->getBoardSizeX() - 1) headNew.pos->x = 1;
     if (headNew.pos->y < 1) headNew.pos->y = mainGameMechsRef->getBoardSizeY() - 2;
@@ -101,9 +103,10 @@ void Player::movePlayer() {
 }
 // More methods to be added
 
-void Player::checkselfcoll(const objPos& headNew) {
-    // Check if the new head position collides with any part of the snake body
-    for (int i = 1; i < playerPosList->getSize(); ++i) { // Skip the head (index 0)
+void Player::checkselfcoll(const objPos& headNew)  // Checks if the player collides with its own body 
+{
+    
+    for (int i = 1; i < playerPosList->getSize(); ++i) { 
         objPos bodyPart = playerPosList->getElement(i);
         if (headNew.pos->x == bodyPart.pos->x && headNew.pos->y == bodyPart.pos->y) {
             mainGameMechsRef->setLoseFlag();
@@ -113,7 +116,8 @@ void Player::checkselfcoll(const objPos& headNew) {
     }
 }
 
-void Player::checkfoodcoll(const objPos& headNew) {
+void Player::checkfoodcoll(const objPos& headNew) // Checks if the player collides with regular food
+{
     // Check collision with regular foods
     for (int i = 0; i < 2; ++i) {
         objPos food = mainGameMechsRef->getRegularFood(i);
@@ -136,19 +140,21 @@ void Player::checkfoodcoll(const objPos& headNew) {
 }
 
 
-void Player::handleMovement(const objPos& headNew) 
+void Player::handleMovement(const objPos& headNew) // Handles movement and manages the snake's body
 {
     playerPosList->insertHead(headNew);
 
     // Remove the tail only if food was not consumed
-    if (playerPosList->getSize() > 1) {
+    if (playerPosList->getSize() > 1) 
+    {
         playerPosList->removeTail();
     }
 }
 
 
 
-void Player::checkSpecialfoodcoll(const objPos& headNew) {
+void Player::checkSpecialfoodcoll(const objPos& headNew) // Checks if the player collides with special food 
+{
     // Check if special food is active
     if (mainGameMechsRef->isSpecialFoodActive()) {
         objPos specialFood = mainGameMechsRef->getSpecialFood();
@@ -158,8 +164,8 @@ void Player::checkSpecialfoodcoll(const objPos& headNew) {
             mainGameMechsRef->incrementScore(20); // Add 20 points to the score
 
             // Deactivate the special food and regenerate all foods
-            mainGameMechsRef->setSpecialFoodActive(false); // Mark special food as inactive
-            mainGameMechsRef->generateFoods(*playerPosList); // Regenerate all foods
+            mainGameMechsRef->setSpecialFoodActive(false); 
+            mainGameMechsRef->generateFoods(*playerPosList); 
         }
     }
 }
