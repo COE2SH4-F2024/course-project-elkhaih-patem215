@@ -17,16 +17,16 @@ class Player
     public:
         enum Dir {UP, DOWN, LEFT, RIGHT, STOP};  // This is the direction state
 
-        Player(GameMechs* thisGMRef);
-        ~Player();
+        Player(GameMechs* thisGMRef); // Constructor
+        ~Player(); // Destructor
 
-        objPosArrayList* getPlayerPosList() const; // Upgrade this in iteration 3.       
+        objPosArrayList* getPlayerPosList() const; // Retrieves the list of positions representing the player's current state // Upgrade this in iteration 3.       
         void updatePlayerDir();
         void movePlayer();
-        void checkfoodcoll(const objPos& headNew);
-        void checkselfcoll(const objPos& headNew);
-        void handleMovement(const objPos& headNew);
-        void checkSpecialfoodcoll(const objPos& headNew);
+        void checkfoodcoll(const objPos& headNew); // Checks if the player collides with food and handles consumption
+        void checkselfcoll(const objPos& headNew); // Checks if the player collides with itself
+        void handleMovement(const objPos& headNew); // Handles movement logic for the player, including updating position
+        void checkSpecialfoodcoll(const objPos& headNew); // Checks if the player collides with special food and handles the event
 
         //Bonus
         void setSpecialFoodActive(bool isActive);
@@ -34,11 +34,12 @@ class Player
         // More methods to be added here
 
     private:
-        objPosArrayList* playerPosList; // Upgrade this in iteration 3.       
-        enum Dir myDir;
-        int quit = 0;
+        objPosArrayList* playerPosList; // List representing the player's body positions // Upgrade this in iteration 3.       
+        enum Dir myDir; // Current direction of the player
+        int quit = 0;  // Flag to indicate if the player has quit the game
 
-        // Need a reference to the Main Game Mechanisms
+
+        // Reference to the main game mechanics object for interaction
         GameMechs* mainGameMechsRef;
 
         
